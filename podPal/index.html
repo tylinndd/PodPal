@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PodPal with Overlay Navbar</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    />
+  </head>
+  <body>
+    <div class="ipod">
+      <div class="screen">
+        <!-- Static UI Layer -->
+        <div class="screen-ui">
+          <!-- Header -->
+          <div class="screen-header">
+            <div class="header-time">8:12</div>
+            <div class="header-icons">
+              <span class="material-symbols-outlined">wifi</span>
+              <span class="material-symbols-outlined">bluetooth</span>
+              <span class="material-symbols-outlined">battery_full</span>
+            </div>
+          </div>
+
+          <!-- Overlay background when menu is open -->
+          <div class="screen-overlay" id="screenOverlay"></div>
+
+          <!-- Nav menu -->
+          <div class="nav-menu" id="navMenu">
+            <button class="nav-button" onclick="showScreen('home')">
+              Home
+            </button>
+            <button class="nav-button" onclick="showScreen('nowplaying')">
+              Now Playing
+            </button>
+            <button class="nav-button" onclick="showScreen('library')">
+              Library
+            </button>
+            <button class="nav-button" onclick="showScreen('settings')">
+              Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Layer -->
+        <div class="screen-content">
+          <div class="app-screen" id="home-screen">
+            <div class="home-container">
+              <div class="playlist-section" id="playlistSection">
+                <div class="home-greeting">
+                  <h3>Hello, Name</h3>
+                  <p>Tell me what you're feeling and I'll handle the rest.</p>
+                </div>
+                <h3>Your Mixes</h3>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Chill Beats" />
+                  <span>Chill Beats</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Throwbacks" />
+                  <span>Throwbacks</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Focus Flow" />
+                  <span>Focus Flow</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Road Trip" />
+                  <span>Road Trip</span>
+                </div>
+
+                <h3>New Releases</h3>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Lo-Fi Stars" />
+                  <span>Lo-Fi Stars</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Late Night" />
+                  <span>Late Night</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-screen" id="nowplaying-screen">
+            <div class="nowplaying-container">
+              <img
+                id="nowplaying-cover"
+                src="https://via.placeholder.com/120"
+                alt="Album Cover"
+              />
+              <div class="track-info">
+                <div id="nowplaying-title">Loading...</div>
+                <div id="nowplaying-artist">Artist</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-screen" id="library-screen">
+            <div class="library-container">
+              <div class="library-section" id="librarySection">
+                <h3>Your Library</h3>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Liked Songs" />
+                  <span>Liked Songs</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Late Nights" />
+                  <span>Late Nights</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Study Music" />
+                  <span>Study Music</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="Throwbacks" />
+                  <span>Throwbacks</span>
+                </div>
+                <div class="album">
+                  <img
+                    src="https://via.placeholder.com/50"
+                    alt="INSERT ALBUM"
+                  />
+                  <span>INSERT ALBUM</span>
+                </div>
+                <div class="album">
+                  <img src="https://via.placeholder.com/50" alt="LoFi Mix" />
+                  <span>Lo-Fi Mix</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-screen" id="settings-screen">
+            <div class="settings-container" id="settingsSection">
+              <!-- Filler Settings -->
+              <h3>General</h3>
+              <div class="setting-item">
+                <span>Accessibility</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </div>
+              <div class="setting-item">
+                <span>Bluetooth</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </div>
+              <div class="setting-item">
+                <span>Security</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </div>
+              <div class="setting-item">
+                <span>Storage</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </div>
+              <div class="setting-item">
+                <span>Software Update</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </div>
+              <div class="setting-item">
+                <span>Privacy</span>
+                <span class="material-symbols-outlined">chevron_right</span>
+              </div>
+
+              <!-- Appearance Settings -->
+              <h3>Appearance</h3>
+              <div class="setting-item" data-setting="theme">
+                <span>Light Mode</span>
+                <label class="switch">
+                  <input type="checkbox" id="themeToggle" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <div class="setting-item" data-setting="color">
+                <div class="color-options">
+                  <div
+                    class="color-circle"
+                    data-color="#ffffff"
+                    title="Classic White"
+                  ></div>
+                  <div
+                    class="color-circle"
+                    data-color="#1F1F1F"
+                    title="Black"
+                  ></div>
+                  <div
+                    class="color-circle"
+                    data-color="#C2202D"
+                    title="Red"
+                  ></div>
+                  <div
+                    class="color-circle"
+                    data-color="#0085AC"
+                    title="Blue"
+                  ></div>
+                  <div
+                    class="color-circle"
+                    data-color="#C22D81"
+                    title="Pink"
+                  ></div>
+                  <div
+                    class="color-circle"
+                    data-color="#83B334"
+                    title="Green"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Voice Recording Mic Popup -->
+        <div class="mic-popup" id="micPopup">
+          <span class="material-symbols-outlined">mic</span>
+        </div>
+      </div>
+
+      <!-- Click wheel -->
+      <div class="click-wheel">
+        <div class="button menu">MENU</div>
+        <div class="button forward" id="scrollDown">&#9654;&#9654;</div>
+        <div class="button backward" id="scrollUp">&#9664;&#9664;</div>
+        <div class="button play">&#9654;||</div>
+        <div class="center-button" id="micButton">
+          <span class="material-symbols-outlined">mic</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

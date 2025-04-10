@@ -1,0 +1,20 @@
+
+
+
+{
+    "id": "12345",
+    "title": "Song Title",
+    "artist": "Artist Name",
+    "album": "Album Name",
+    "duration": 210,
+    "genre": "Genre",
+    "release_date": "2023-01-01",
+    "track_number": 1,
+    "url": "https://example.com/song.mp3",
+    "cover_art": "https://example.com/cover.jpg",
+    "metadata": {
+        "bitrate": "320kbps",
+        "sample_rate": "44.1kHz",
+        "channels": "stereo"
+    }
+}
