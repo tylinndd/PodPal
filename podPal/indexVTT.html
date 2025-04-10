@@ -17,6 +17,7 @@
     const startButton = document.getElementById('start-button');
     const stopButton = document.getElementById('stop-button');
     const outputText = document.getElementById('output-text');
+    let capturedText = ''; // Variable to store captured text
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -24,16 +25,17 @@
       outputText.textContent = "Speech Recognition not supported in this browser.";
     } else {
       const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.lang = 'en-US';
-      recognition.interimResults = true;
+      recognition.continuous = true;  // Allows continuous speech recognition
+      recognition.lang = 'en-US';     // Language set to English (US)
+      recognition.interimResults = true; // Enables interim results
 
       recognition.onresult = (event) => {
-        let transcript = '';
+        let transcript = ''; // Temporary variable to store results in the current event
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           transcript += event.results[i][0].transcript;
         }
-        outputText.textContent = transcript;
+        capturedText = transcript;  // Store captured text in the variable
+        outputText.textContent = "You said: " + transcript; // Show the captured text immediately
       };
 
       recognition.onerror = (event) => {
@@ -47,7 +49,12 @@
 
       stopButton.addEventListener('click', () => {
         recognition.stop();
-        outputText.textContent += " (Stopped)";
+        outputText.textContent = "Stopped listening.";
+
+        // After stopping, capturedText holds the final value
+        // Now, you can print it to the screen and use it as needed
+        console.log("Captured Text:", capturedText); // Example: log to console
+        outputText.textContent += " Final capture: " + capturedText; // Display the final captured text on screen
       });
     }
   </script>
