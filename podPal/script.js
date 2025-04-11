@@ -86,3 +86,49 @@ if (!SpeechRecognition) {
   micButton.addEventListener("touchend", handlePressEnd);
   micButton.addEventListener("touchcancel", handlePressEnd);
 }
+
+const menuButton = document.querySelector(".button.menu");
+const navMenu = document.getElementById("navMenu");
+const screenOverlay = document.getElementById("screenOverlay");
+
+menuButton.addEventListener("click", () => {
+  const isOpen = navMenu.classList.contains("show");
+
+  if (isOpen) {
+    navMenu.classList.remove("show");
+    screenOverlay.classList.remove("show");
+    document.querySelector(".screen").classList.remove("no-scroll");
+  } else {
+    navMenu.classList.add("show");
+    screenOverlay.classList.add("show");
+    document.querySelector(".screen").classList.add("no-scroll");
+  }
+});
+
+screenOverlay.addEventListener("click", () => {
+  navMenu.classList.remove("show");
+  screenOverlay.classList.remove("show");
+  document.querySelector(".screen").classList.remove("no-scroll");
+});
+
+function showScreen(screenId) {
+  // Hide all screens
+  const screens = document.querySelectorAll('.app-screen');
+  screens.forEach(screen => screen.classList.remove('show'));
+  
+  // Display the target screen. Expected id format: [screenId]-screen
+  const targetScreen = document.getElementById(screenId + '-screen');
+  if (targetScreen) {
+    targetScreen.classList.add('show');
+  } else {
+    console.error('Screen with id "' + screenId + '-screen" not found.');
+  }
+  
+  // Close the nav menu and remove overlay & no-scroll classes
+  if (typeof navMenu !== 'undefined') navMenu.classList.remove('show');
+  if (typeof screenOverlay !== 'undefined') screenOverlay.classList.remove('show');
+  const screenContainer = document.querySelector('.screen');
+  if (screenContainer) {
+    screenContainer.classList.remove('no-scroll');
+  }
+}
