@@ -90,10 +90,11 @@ function displayTrack(index) {
   document.getElementById("nowplaying-title").innerText = track.title;
   document.getElementById("nowplaying-artist").innerText = track.artist && track.artist.name ? track.artist.name : track.artist;
   
-  // Play the preview
+  // Play the preview and set autoplay for the next track
   const audio = document.getElementById("music-player");
   audio.src = track.preview;
   audio.play();
+  audio.onended = nextTrack; // when the current track ends, play the next track automatically
 }
 
 function nextTrack() {
