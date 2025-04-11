@@ -3,16 +3,21 @@ let currentTrackIndex = 0;
 
 function searchDeezer(queryString = null) {
   const query = queryString || document.getElementById("searchQuery").value.trim();
+  
   if (!query) {
     alert("Please enter a search query.");
     return;
   }
-  
+
+  console.log("🎯 Searching for:", query);
+
   const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=handleResults`;
 
-  // Remove any existing JSONP script
+  // Remove any existing JSONP script to prevent duplicates
   const oldScript = document.getElementById("jsonpScript");
-  if (oldScript) oldScript.remove();
+  if (oldScript) {
+    oldScript.remove();
+  }
 
   // Create and append the new JSONP script
   const script = document.createElement("script");
@@ -21,30 +26,28 @@ function searchDeezer(queryString = null) {
   document.body.appendChild(script);
 }
 
-function handleResults(response) {
-  const resultsDiv = document.getElementById("results");
-  if (resultsDiv) {
-    resultsDiv.innerHTML = "";
-  }
-  
-  if (!response.data || response.data.length === 0) {
-    if (resultsDiv) resultsDiv.innerHTML = "<p>No results found.</p>";
-    return;
-  }
-  
-  // Use the first track from the search results as the initial displayed track
-  const initialDisplayedTrack = response.data[0];
-  
-  // Immediately display the first track
-  musicPlaylist = [initialDisplayedTrack];
-  currentTrackIndex = 0;
-  displayTrack(currentTrackIndex);
-  
-  // If an artist id is available, fetch the artist's top tracks
-  if (initialDisplayedTrack.artist && initialDisplayedTrack.artist.id) {
-    getArtistTopTracks(initialDisplayedTrack.artist.id);
+// This function needs to exist to handle the JSONP callback
+function handleResults(data) {
+  if (data && data.data && data.data.length > 0) {
+    const track = data.data[0]; // pick the first track
+
+    const musicPlayer = document.getElementById('music-player');
+    const title = document.getElementById('nowplaying-title');
+    const artist = document.getElementById('nowplaying-artist');
+    const cover = document.getElementById('nowplaying-cover');
+
+    title.textContent = track.title;
+    artist.textContent = track.artist.name;
+    cover.src = track.album.cover_medium; // use album cover
+    musicPlayer.src = track.preview; // use Deezer's preview audio
+    musicPlayer.play();
+
+    console.log(`▶️ Now Playing: ${track.title} by ${track.artist.name}`);
+  } else {
+    alert('No results found.');
   }
 }
+
 
 function getArtistTopTracks(artistId) {
   const url = `https://api.deezer.com/artist/${artistId}/top?limit=10&output=jsonp&callback=handleArtistResults`;

@@ -1,5 +1,3 @@
-// Speech Recognition and Speech Synthesis Integration
-
 const outputText = document.getElementById('output-text');
 let capturedText = '';
 
@@ -10,7 +8,7 @@ if (!SpeechRecognition) {
 } else {
   const recognition = new SpeechRecognition();
   recognition.continuous = true;
-  recognition.lang = 'en-US';
+  recognition.lang =  'en-US';
   recognition.interimResults = true;
 
   recognition.onresult = (event) => {
@@ -66,11 +64,18 @@ if (!SpeechRecognition) {
         if (data.assistantResponse) {
           outputText.textContent = "Assistant says: " + data.assistantResponse;
 
-          // Text-to-speech: Use browser's speech synthesis to speak the response
-          const speech = new SpeechSynthesisUtterance(data.assistantResponse);
-          window.speechSynthesis.speak(speech);
-        } else {
-          outputText.textContent = "Error: Unable to get response from OpenAI.";
+          const utterance = new SpeechSynthesisUtterance(data.assistantResponse);
+
+          utterance.onend = () => {
+            const cleanedQuery = data.assistantResponse
+              .replace(/(play|find|search for)/i, '') // clean AI text
+              .trim();
+
+            document.getElementById('searchQuery').value = cleanedQuery; // optional but looks nice
+            searchDeezer(cleanedQuery); // 🎯 AUTO SEARCH AND PLAY
+          };
+
+          window.speechSynthesis.speak(utterance);
         }
       })
       .catch(error => {

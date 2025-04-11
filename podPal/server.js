@@ -1,14 +1,15 @@
+// server.js
 const express = require('express');
-const fetch = require('node-fetch'); // Make sure to install this
-require('dotenv').config(); // To load API key from .env file
+const fetch = require('node-fetch'); // install it if needed
+require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());  // To parse JSON body data
-app.use(express.static('public')); // Serve your HTML, CSS, JS files
+app.use(express.json());
+app.use(express.static('public')); // serve your files
 
-// Endpoint for assistant to process input
+// Endpoint for assistant
 app.post('/api/assistant', async (req, res) => {
   const userInput = req.body.userInput;
 
@@ -17,22 +18,25 @@ app.post('/api/assistant', async (req, res) => {
   }
 
   try {
-    const openAIResponse = await fetch('https://api.openai.com/v1/completions', {
+    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ASSIST_KEY}`,  // Use the ASSIST_KEY from the environment variable
+        'Authorization': `Bearer ${process.env.ASSIST_KEY}`,
       },
       body: JSON.stringify({
-        model: 'text-davinci-003',
-        prompt: userInput,
-        max_tokens: 150,
-        temperature: 0.7,
+        model: 'gpt-4o', // ✅ using gpt-4o-mini
+        messages: [
+          { role: 'system', content: 'You are a music assistant for Auri. Only reply with a simple sentence suggesting a search query, like: "Play Taylor Swift" or "Find Lo-Fi Chill Beats".' },
+          { role: 'user', content: userInput },
+        ],
+        max_tokens: 100,
+        temperature: 0.5,
       }),
     });
 
     const data = await openAIResponse.json();
-    const assistantResponse = data.choices[0].text.trim();
+    const assistantResponse = data.choices[0].message.content.trim();
 
     res.status(200).json({ assistantResponse });
   } catch (error) {
@@ -41,7 +45,6 @@ app.post('/api/assistant', async (req, res) => {
   }
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
