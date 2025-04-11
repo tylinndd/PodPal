@@ -81,13 +81,10 @@ function displayTrack(index) {
   const track = musicPlaylist[index];
   
   // Determine cover image URL based on the API's structure.
-  // If the track.album object exists and has cover_medium, use it.
-  // Otherwise, fallback to track.cover_art.
   let coverUrl = (track.album && track.album.cover_medium) || track.cover_art || "https://via.placeholder.com/120";
   
   document.getElementById("nowplaying-cover").src = coverUrl;
   document.getElementById("nowplaying-title").innerText = track.title;
-  // If artist is an object, use its name; otherwise, display the artist string.
   document.getElementById("nowplaying-artist").innerText = track.artist && track.artist.name ? track.artist.name : track.artist;
   
   // Play the preview
@@ -114,3 +111,86 @@ window.searchDeezer = searchDeezer;
 // Expose the scroll functions globally
 window.nextTrack = nextTrack;
 window.prevTrack = prevTrack;
+
+// === Integrating Speech Recognition ===
+
+// Initialize SpeechRecognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.continuous = true;
+recognition.lang = 'en-US';
+recognition.interimResults = true;
+
+recognition.onresult = function(event) {
+  let transcript = '';
+  for (let i = event.resultIndex; i < event.results.length; ++i) {
+    transcript += event.results[i][0].transcript;
+  }
+
+  // Show the voice input (for debugging purposes)
+  console.log("Captured voice:", transcript);
+
+  // Send the voice input to the backend assistant for processing
+  fetch('/api/assistant', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userInput: transcript }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Process the assistant's response
+    if (data.assistantResponse) {
+      // If the assistant returns a query for music, perform the search
+      if (data.assistantResponse.toLowerCase().includes("music")) {
+        const searchQuery = data.assistantResponse.replace("search for", "").trim();
+        searchDeezer(searchQuery);  // Trigger music search
+      } else {
+        // Handle other commands
+        console.log("Assistant says:", data.assistantResponse);
+      }
+    }
+  })
+  .catch(error => console.error('Error with assistant request:', error));
+};
+
+recognition.onerror = function(event) {
+  console.error('Speech recognition error:', event.error);
+};
+
+// Add event listeners to buttons for starting and stopping speech recognition
+const micButton = document.getElementById('micButton');
+const micPopup = document.getElementById("micPopup");
+const screenOverlay = document.getElementById("screenOverlay");
+
+let micHoldTimer = null;
+
+// Handle mic button press start
+function handlePressStart() {
+  micHoldTimer = setTimeout(() => {
+    micPopup.classList.add("show");
+    screenOverlay.classList.add("show"); // Darken background
+    recognition.start();  // Start listening for speech input
+  }, 750); // Delay before starting recognition
+}
+
+// Handle mic button press end
+function handlePressEnd() {
+  clearTimeout(micHoldTimer);
+  micHoldTimer = null;
+  
+  if (micPopup.classList.contains("show")) {
+    micPopup.classList.remove("show");
+    screenOverlay.classList.remove("show"); // Remove dark overlay
+  }
+
+  recognition.stop();  // Stop recognition
+}
+
+micButton.addEventListener("mousedown", handlePressStart);
+micButton.addEventListener("mouseup", handlePressEnd);
+micButton.addEventListener("mouseleave", handlePressEnd);
+micButton.addEventListener("touchstart", handlePressStart);
+micButton.addEventListener("touchend", handlePressEnd);
+micButton.addEventListener("touchcancel", handlePressEnd);
