@@ -22,5 +22,8 @@
                 "saveCode": "themeToggle.addEventListener(\"change\", () => {\n    const theme = themeToggle.checked ? \"light\" : \"dark\";\n    document.documentElement.setAttribute(\"data-theme\", theme);\n    localStorage.setItem(\"theme\", theme);\n  });"
             }
         }
+    },
+    "colorHandling": {
+        "syncCode": "const savedColor = localStorage.getItem(\"ipodColor\");\n  if (savedColor) {\n    document.querySelector(\".ipod\").style.backgroundColor = savedColor;\n    document.querySelectorAll(\".color-circle\").forEach((circle) => {\n      if (circle.dataset.color === savedColor) {\n        circle.classList.add(\"selected\");\n      } else {\n        circle.classList.remove(\"selected\");\n      }\n    });\n  }\n\n  document.querySelectorAll(\".color-circle\").forEach((circle) => {\n    const color = circle.dataset.color;\n    circle.style.backgroundColor = color;\n    circle.addEventListener(\"click\", () => {\n      document.querySelectorAll(\".color-circle\").forEach(c => c.classList.remove(\"selected\"));\n      circle.classList.add(\"selected\");\n      document.querySelector(\".ipod\").style.backgroundColor = color;\n      localStorage.setItem(\"ipodColor\", color);\n    });\n  });"
     }
 }

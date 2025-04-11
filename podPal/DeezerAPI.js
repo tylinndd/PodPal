@@ -11,6 +11,32 @@ if (savedTheme === "light") {
   themeToggle.checked = false;
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+  // Theme setup...
+  const savedColor = localStorage.getItem("ipodColor");
+  if (savedColor) {
+    document.querySelector(".ipod").style.backgroundColor = savedColor;
+    document.querySelectorAll(".color-circle").forEach((circle) => {
+      if (circle.dataset.color === savedColor) {
+        circle.classList.add("selected");
+      } else {
+        circle.classList.remove("selected");
+      }
+    });
+  }
+
+  document.querySelectorAll(".color-circle").forEach((circle) => {
+    const color = circle.dataset.color;
+    circle.style.backgroundColor = color;
+    circle.addEventListener("click", () => {
+      document.querySelectorAll(".color-circle").forEach(c => c.classList.remove("selected"));
+      circle.classList.add("selected");
+      document.querySelector(".ipod").style.backgroundColor = color;
+      localStorage.setItem("ipodColor", color);
+    });
+  });
+});
+
 function searchDeezer(queryString = null) {
   const query = queryString || document.getElementById("searchQuery").value.trim();
   
