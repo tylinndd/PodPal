@@ -84,13 +84,10 @@ function displayTrack(index) {
   const track = musicPlaylist[index];
   
   // Determine cover image URL based on the API's structure.
-  // If the track.album object exists and has cover_medium, use it.
-  // Otherwise, fallback to track.cover_art.
   let coverUrl = (track.album && track.album.cover_medium) || track.cover_art || "https://via.placeholder.com/120";
   
   document.getElementById("nowplaying-cover").src = coverUrl;
   document.getElementById("nowplaying-title").innerText = track.title;
-  // If artist is an object, use its name; otherwise, display the artist string.
   document.getElementById("nowplaying-artist").innerText = track.artist && track.artist.name ? track.artist.name : track.artist;
   
   // Play the preview
