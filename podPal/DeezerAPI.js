@@ -26,25 +26,28 @@ function searchDeezer(queryString = null) {
   document.body.appendChild(script);
 }
 
-// This function needs to exist to handle the JSONP callback
-function handleResults(data) {
-  if (data && data.data && data.data.length > 0) {
-    const track = data.data[0]; // pick the first track
-
-    const musicPlayer = document.getElementById('music-player');
-    const title = document.getElementById('nowplaying-title');
-    const artist = document.getElementById('nowplaying-artist');
-    const cover = document.getElementById('nowplaying-cover');
-
-    title.textContent = track.title;
-    artist.textContent = track.artist.name;
-    cover.src = track.album.cover_medium; // use album cover
-    musicPlayer.src = track.preview; // use Deezer's preview audio
-    musicPlayer.play();
-
-    console.log(`▶️ Now Playing: ${track.title} by ${track.artist.name}`);
-  } else {
-    alert('No results found.');
+function handleResults(response) {
+  const resultsDiv = document.getElementById("results");
+  if (resultsDiv) {
+    resultsDiv.innerHTML = "";
+  }
+  
+  if (!response.data || response.data.length === 0) {
+    if (resultsDiv) resultsDiv.innerHTML = "<p>No results found.</p>";
+    return;
+  }
+  
+  // Use the first track from the search results as the initial displayed track
+  const initialDisplayedTrack = response.data[0];
+  
+  // Immediately display the first track
+  musicPlaylist = [initialDisplayedTrack];
+  currentTrackIndex = 0;
+  displayTrack(currentTrackIndex);
+  
+  // If an artist id is available, fetch the artist's top tracks
+  if (initialDisplayedTrack.artist && initialDisplayedTrack.artist.id) {
+    getArtistTopTracks(initialDisplayedTrack.artist.id);
   }
 }
 
@@ -90,10 +93,11 @@ function displayTrack(index) {
   document.getElementById("nowplaying-title").innerText = track.title;
   document.getElementById("nowplaying-artist").innerText = track.artist && track.artist.name ? track.artist.name : track.artist;
   
-  // Play the preview
+  // Play the preview and set autoplay for the next track
   const audio = document.getElementById("music-player");
   audio.src = track.preview;
   audio.play();
+  audio.onended = nextTrack; // when the current track ends, play the next track automatically
 }
 
 function nextTrack() {
@@ -115,85 +119,48 @@ window.searchDeezer = searchDeezer;
 window.nextTrack = nextTrack;
 window.prevTrack = prevTrack;
 
-// === Integrating Speech Recognition ===
-
-// Initialize SpeechRecognition
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const recognition = new SpeechRecognition();
-recognition.continuous = true;
-recognition.lang = 'en-US';
-recognition.interimResults = true;
-
-recognition.onresult = function(event) {
-  let transcript = '';
-  for (let i = event.resultIndex; i < event.results.length; ++i) {
-    transcript += event.results[i][0].transcript;
-  }
-
-  // Show the voice input (for debugging purposes)
-  console.log("Captured voice:", transcript);
-
-  // Send the voice input to the backend assistant for processing
-  fetch('/api/assistant', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ userInput: transcript }),
-  })
-  .then(response => response.json())
-  .then(data => {
-    // Process the assistant's response
-    if (data.assistantResponse) {
-      // If the assistant returns a query for music, perform the search
-      if (data.assistantResponse.toLowerCase().includes("music")) {
-        const searchQuery = data.assistantResponse.replace("search for", "").trim();
-        searchDeezer(searchQuery);  // Trigger music search
-      } else {
-        // Handle other commands
-        console.log("Assistant says:", data.assistantResponse);
-      }
-    }
-  })
-  .catch(error => console.error('Error with assistant request:', error));
-};
-
-recognition.onerror = function(event) {
-  console.error('Speech recognition error:', event.error);
-};
-
-// Add event listeners to buttons for starting and stopping speech recognition
-const micButton = document.getElementById('micButton');
-const micPopup = document.getElementById("micPopup");
+const menuButton = document.querySelector(".button.menu");
+const navMenu = document.getElementById("navMenu");
 const screenOverlay = document.getElementById("screenOverlay");
 
-let micHoldTimer = null;
+menuButton.addEventListener("click", () => {
+  const isOpen = navMenu.classList.contains("show");
 
-// Handle mic button press start
-function handlePressStart() {
-  micHoldTimer = setTimeout(() => {
-    micPopup.classList.add("show");
-    screenOverlay.classList.add("show"); // Darken background
-    recognition.start();  // Start listening for speech input
-  }, 750); // Delay before starting recognition
-}
-
-// Handle mic button press end
-function handlePressEnd() {
-  clearTimeout(micHoldTimer);
-  micHoldTimer = null;
-  
-  if (micPopup.classList.contains("show")) {
-    micPopup.classList.remove("show");
-    screenOverlay.classList.remove("show"); // Remove dark overlay
+  if (isOpen) {
+    navMenu.classList.remove("show");
+    screenOverlay.classList.remove("show");
+    document.querySelector(".screen").classList.remove("no-scroll");
+  } else {
+    navMenu.classList.add("show");
+    screenOverlay.classList.add("show");
+    document.querySelector(".screen").classList.add("no-scroll");
   }
+});
 
-  recognition.stop();  // Stop recognition
+screenOverlay.addEventListener("click", () => {
+  navMenu.classList.remove("show");
+  screenOverlay.classList.remove("show");
+  document.querySelector(".screen").classList.remove("no-scroll");
+});
+
+function showScreen(screenId) {
+  // Hide all screens
+  const screens = document.querySelectorAll('.app-screen');
+  screens.forEach(screen => screen.classList.remove('show'));
+  
+  // Display the target screen. Expected id format: [screenId]-screen
+  const targetScreen = document.getElementById(screenId + '-screen');
+  if (targetScreen) {
+    targetScreen.classList.add('show');
+  } else {
+    console.error('Screen with id "' + screenId + '-screen" not found.');
+  }
+  
+  // Close the nav menu and remove overlay & no-scroll classes
+  if (typeof navMenu !== 'undefined') navMenu.classList.remove('show');
+  if (typeof screenOverlay !== 'undefined') screenOverlay.classList.remove('show');
+  const screenContainer = document.querySelector('.screen');
+  if (screenContainer) {
+    screenContainer.classList.remove('no-scroll');
+  }
 }
-
-micButton.addEventListener("mousedown", handlePressStart);
-micButton.addEventListener("mouseup", handlePressEnd);
-micButton.addEventListener("mouseleave", handlePressEnd);
-micButton.addEventListener("touchstart", handlePressStart);
-micButton.addEventListener("touchend", handlePressEnd);
-micButton.addEventListener("touchcancel", handlePressEnd);
