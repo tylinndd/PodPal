@@ -47,12 +47,17 @@
 
         <!-- Content Layer -->
         <div class="screen-content">
+          <!-- Home Screen -->
           <div class="app-screen" id="home-screen">
             <div class="home-container">
               <div class="playlist-section" id="playlistSection">
                 <div class="home-greeting">
                   <h3>Hello, Name</h3>
                   <p>Tell me what you're feeling and I'll handle the rest.</p>
+                  <input type="text" id="searchQuery" placeholder="Search for music..." />
+                  <button onclick="searchDeezer()">Search</button>
+                  <!-- Container for search results; can be used if you want to list multiple tracks -->
+                  <div id="results"></div>
                 </div>
                 <h3>Your Mixes</h3>
                 <div class="album">
@@ -85,6 +90,7 @@
             </div>
           </div>
 
+          <!-- Now Playing Screen -->
           <div class="app-screen" id="nowplaying-screen">
             <div class="nowplaying-container">
               <img
@@ -96,9 +102,17 @@
                 <div id="nowplaying-title">Loading...</div>
                 <div id="nowplaying-artist">Artist</div>
               </div>
+              <!-- Audio element for the track preview -->
+              <audio id="music-player" controls autoplay></audio>
+              <!-- Track controls for scrolling through the music playlist -->
+              <div class="track-controls">
+                <button onclick="prevTrack()">Previous</button>
+                <button onclick="nextTrack()">Next</button>
+              </div>
             </div>
           </div>
 
+          <!-- Library Screen -->
           <div class="app-screen" id="library-screen">
             <div class="library-container">
               <div class="library-section" id="librarySection">
@@ -120,10 +134,7 @@
                   <span>Throwbacks</span>
                 </div>
                 <div class="album">
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="INSERT ALBUM"
-                  />
+                  <img src="https://via.placeholder.com/50" alt="INSERT ALBUM" />
                   <span>INSERT ALBUM</span>
                 </div>
                 <div class="album">
@@ -134,6 +145,7 @@
             </div>
           </div>
 
+          <!-- Settings Screen -->
           <div class="app-screen" id="settings-screen">
             <div class="settings-container" id="settingsSection">
               <!-- Filler Settings -->
@@ -228,6 +240,7 @@
       </div>
     </div>
 
+    <script src="DeezerAPI.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
