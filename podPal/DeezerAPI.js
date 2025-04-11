@@ -1,6 +1,16 @@
 let musicPlaylist = []; // stores all tracks from search
 let currentTrackIndex = 0;
 
+// Check for saved theme preference on load
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "light") {
+  document.documentElement.setAttribute("data-theme", "light");
+  themeToggle.checked = true;
+} else {
+  document.documentElement.setAttribute("data-theme", "dark");
+  themeToggle.checked = false;
+}
+
 function searchDeezer(queryString = null) {
   const query = queryString || document.getElementById("searchQuery").value.trim();
   
@@ -164,3 +174,10 @@ function showScreen(screenId) {
     screenContainer.classList.remove('no-scroll');
   }
 }
+
+// === Theme Toggle ===
+themeToggle.addEventListener("change", () => {
+  const theme = themeToggle.checked ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+});

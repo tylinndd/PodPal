@@ -1,6 +1,3 @@
-
-
-
 {
     "id": "12345",
     "title": "Song Title",
@@ -16,5 +13,14 @@
         "bitrate": "320kbps",
         "sample_rate": "44.1kHz",
         "channels": "stereo"
+    },
+    "themeToggle": {
+        "sync": "true",
+        "eventListener": {
+            "change": {
+                "syncCode": "// Check for saved theme preference on load\n  const savedTheme = localStorage.getItem(\"theme\");\n  if (savedTheme === \"light\") {\n    document.documentElement.setAttribute(\"data-theme\", \"light\");\n    themeToggle.checked = true;\n  } else {\n    document.documentElement.setAttribute(\"data-theme\", \"dark\");\n    themeToggle.checked = false;\n  }",
+                "saveCode": "themeToggle.addEventListener(\"change\", () => {\n    const theme = themeToggle.checked ? \"light\" : \"dark\";\n    document.documentElement.setAttribute(\"data-theme\", theme);\n    localStorage.setItem(\"theme\", theme);\n  });"
+            }
+        }
     }
 }
