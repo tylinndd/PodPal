@@ -7,8 +7,4 @@
       { "src": "/api/(.*)", "dest": "server.js" }
     ]
   }
-<<<<<<< HEAD
-  
-=======
-  
->>>>>>> 16b3aedbce2e223880bcad0e8b42e9757a22a262
+
